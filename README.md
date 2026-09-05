@@ -1,4 +1,3 @@
-# PSO2_Skill_Simulator
 A skill tree simulator for classic PSO2
 [日本語](README.md) | [中文](README_CN.md)
 
