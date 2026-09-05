@@ -20,7 +20,6 @@ A skill tree simulator for classic PSO2
 ## 参考資料
 
 - [PSO2 ファンタシースターオンライン2 攻略 Wiki（Swiki）](https://pso2.swiki.jp/) — スキルの説明・効果の確認に参照。
-- [PSO2 Skill Simulator](https://pso2sim.com/) — スキルツリーの参考元。
 
 ## 著作権
 
