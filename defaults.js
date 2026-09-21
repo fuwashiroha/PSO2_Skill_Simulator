@@ -1,4 +1,4 @@
-// User-provided screenshot allocations; manual SP only.
+// Screenshot default allocations.
 window.SKILL_DEFAULTS = {
   "hunter": {
     "0": 5,
@@ -82,12 +82,12 @@ window.SKILL_DEFAULTS = {
   "gunner": {
     "0": 3,
     "8": 5,
-    "19": 4,
+    "19": 10,
     "22": 5,
     "28": 1,
     "29": 1,
     "31": 1,
-    "37": 10,
+    "37": 0,
     "39": 2,
     "40": 10,
     "42": 10,
@@ -102,8 +102,9 @@ window.SKILL_DEFAULTS = {
     "59": 5,
     "60": 5,
     "61": 5,
-    "62": 10,
-    "63": 10
+    "62": 9,
+    "63": 10,
+    "65": 5
   },
   "force": {
     "0": 3,
@@ -295,12 +296,13 @@ window.SKILL_DEFAULTS = {
     "45": 1,
     "46": 1,
     "48": 5,
-    "49": 2,
+    "49": 1,
     "50": 5,
     "51": 5,
     "54": 5,
     "55": 5,
-    "56": 10
+    "56": 10,
+    "42": 1
   },
   "etoile": {
     "0": 1,
