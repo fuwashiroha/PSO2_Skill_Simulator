@@ -62,3 +62,13 @@ function parseImport(text){const data=JSON.parse(text.replace(/^\uFEFF/,''));if(
 $('#export-builds').onclick=()=>{const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='PSO2-Skill-Builds.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('#import-builds').onclick=()=>$('#import-file').click();
 $('#import-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>5*1024*1024)throw Error('size');const imported=parseImport(await f.text());if(!confirm(ui('导入将替换全部职业方案及副职业设置，是否继续？','全クラスの配分とサブクラス設定を置き換えますか？')))return;state=imported.state;if(['zh','ja'].includes(imported.language)){lang=imported.language;try{localStorage.setItem('pso2-lang',lang)}catch{}}selected=0;render();notify(ui('全部配点已导入。','全クラスの配分を読み込みました。'))}catch{notify(ui('文件无效或配点不合法，未修改现有存档。','ファイルまたは配分が無効です。既存データは変更していません。'))}finally{e.target.value=''}};
+
+$('#save-screenshot').onclick=async()=>{
+ const button=$('#save-screenshot'),b=JSON.parse(JSON.stringify(get())),role=state.active,language=lang;
+ const name=k=>(language==='ja'?CLASSES[k][2]:CLASSES[k][0])+' '+CLASSES[k][1];
+ const snapshot={build:b,skills:D[b.key],language,role,title:name(b.key),main:name(state.main),sub:state.sub==='none'?(language==='ja'?'なし':'无'):name(state.sub),spent:E.spent(b)};
+ button.disabled=true;
+ try{await window.saveSkillScreenshot(snapshot);notify(language==='ja'?'画像を書き出しました。':'完整天赋截图已导出。')}
+ catch(error){console.error(error);notify(language==='ja'?'画像の保存に失敗しました。もう一度お試しください。':'截图保存失败，请重试。')}
+ finally{button.disabled=false}
+};
