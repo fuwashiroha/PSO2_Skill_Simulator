@@ -52,8 +52,8 @@ document.addEventListener('click',e=>{const nav=e.target.closest('[data-nav]');i
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.node-head')){e.preventDefault();selected=+e.target.closest('[data-node]').dataset.node;drawTree();drawDetail()}});
 $('#nodes').addEventListener('contextmenu',e=>{const node=e.target.closest('[data-node]');if(node){e.preventDefault();const i=+node.dataset.node;change(i,get().points[i]-1)}});
 document.addEventListener('change',e=>{if(e.target.dataset.class){choose(e.target.dataset.class,e.target.value);return}const role=e.target.dataset.level||e.target.dataset.extra;if(role){const b=get(role),next=E.clean({...b,points:[...b.points],[e.target.dataset.level?'level':'extra']:+e.target.value});if(E.spent(next)>next.level+next.extra){notify('调整后 SP 不足，请先减少配点或重置技能树。');render();return}state.builds[buildKey(role,b.key)]=next;render()}});
-$('#lang-toggle').onclick=()=>{lang=lang==='zh'?'ja':'zh';try{localStorage.setItem('pso2-lang',lang)}catch{}render()};$('#zoom').addEventListener('change',e=>{scale=+e.target.value;drawTree()});$('#reset').onclick=()=>{const b=get();if(E.spent(b)&&!confirm(window.translateUI('重置当前职业的全部配点？')))return;state.builds[buildKey()]=E.blank(b.key,b.level,b.extra);render();notify('当前技能树已重置。')};
-$('#share').onclick=async()=>{const url=location.href.split('#')[0]+'#build='+btoa(JSON.stringify(state));try{await navigator.clipboard.writeText(url);notify('配点链接已复制。')}catch{$('#share-url').value=url;$('#share-dialog').showModal();$('#share-url').select()}};$('#close-share').onclick=()=>$('#share-dialog').close();render();
+$('#lang-toggle').onclick=()=>{lang=lang==='zh'?'ja':'zh';try{localStorage.setItem('pso2-lang',lang)}catch{}render()};$('#zoom').addEventListener('change',e=>{scale=+e.target.value;drawTree()});$('#reset').onclick=()=>{const b=get();if(E.spent(b)&&!confirm(ui('清空当前配点？等级与追加 SP 将保留。','現在の配分をすべて消去しますか？レベルと追加SPは保持されます。')))return;state.builds[buildKey()]=E.blank(b.key,b.level,b.extra);render();notify(ui('当前配点已清空。','現在の配分を消去しました。'))};
+render();
 
 $('#restore-default').onclick=()=>{if(!confirm(ui('将当前技能树恢复为默认方案（含等级与追加SP）？当前配点将被替换。','現在のツリーを初期配分（レベル・追加SPを含む）に戻しますか？現在の配分は上書きされます。')))return;state.builds[buildKey()]=defaultBuild();render();notify(ui('已恢复默认配点。','初期配分に戻しました。'))};
 
@@ -71,4 +71,20 @@ $('#save-screenshot').onclick=async()=>{
  try{await window.saveSkillScreenshot(snapshot);notify(language==='ja'?'画像を書き出しました。':'完整天赋截图已导出。')}
  catch(error){console.error(error);notify(language==='ja'?'画像の保存に失敗しました。もう一度お試しください。':'截图保存失败，请重试。')}
  finally{button.disabled=false}
+};
+
+$('#clear-all').onclick=()=>{
+ if(!confirm(ui('清空所有职业的主副职配点？将保留等级、追加 SP 和副职选择，仅保留初始及自动习得技能。建议先导出配点备份。','全クラスのメイン・サブ配分を消去しますか？レベル・追加SP・サブクラス設定は保持し、初期・自動習得スキルのみ残します。事前の書き出しをおすすめします。')))return;
+ const builds={};
+ const blank=id=>{const key=id.split(':').at(-1),old=state.builds[id]||window.DEFAULT_STATE.builds[id];return E.blank(key,old?.level??100,old?.extra??14)};
+ for(const main of Object.keys(CLASSES)){
+  const id='main:'+main;builds[id]=blank(id);
+  if(SUCCESSORS.includes(main))continue;
+  for(const sub of Object.keys(CLASSES))if(sub!==main&&sub!=='hero'){const id='sub:'+main+':'+sub;builds[id]=blank(id)}
+ }
+ state.builds=builds;selected=0;render();notify(ui('所有职业的主副职配点已清空。','全クラスのメイン・サブ配分を消去しました。'));
+};
+$('#reset-all').onclick=()=>{
+ if(!confirm(ui('将所有职业的主副职配点、等级、追加 SP 及副职选择恢复为默认设置？现有全部方案将被替换，建议先导出配点备份。','全クラスのメイン・サブ配分、レベル、追加SP、サブクラス設定を初期設定に戻しますか？現在の全構成を置き換えます。事前の書き出しをおすすめします。')))return;
+ state=JSON.parse(JSON.stringify(window.DEFAULT_STATE));selected=0;render();$('#tree-scroll').scrollTo(0,0);notify(ui('所有职业的配点及副职选择已恢复默认。','全クラスの配分とサブクラス設定を初期設定に戻しました。'));
 };

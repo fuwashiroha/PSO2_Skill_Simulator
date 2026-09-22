@@ -3,3 +3,5 @@
 html[lang="zh-CN"] body{font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif}html[lang="ja"] body{font-family:"Yu Gothic","Meiryo","Noto Sans CJK JP",sans-serif}.node-name{font-size:14px;line-height:1.25}.header-actions{gap:10px}.source{display:block!important}
 
 .header-actions{flex-wrap:wrap;gap:6px}.toolbar{flex-wrap:wrap}.tools{flex-wrap:wrap}@media(max-width:900px){header{height:auto;min-height:75px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}.header-actions{margin-left:0}}
+
+header{height:auto;min-height:86px;padding-top:12px;padding-bottom:12px}.header-actions button{white-space:nowrap}
