@@ -1,7 +1,7 @@
 [日本語](README.md) | [中文](README_CN.md)
 
 # PSO2 Skill Simulator
-<img width="2188" height="1841" alt="image" src="https://github.com/user-attachments/assets/83bcf945-af12-4450-954b-2a38566fa65c" />
+<img width="2170" height="1737" alt="image" src="https://github.com/user-attachments/assets/f854f473-8c71-4e6c-a291-341e2341a8bd" />
 
 旧『PSO2』の全13クラスに対応した、スキルアイコン付きのスキルシミュレーター。日本語・中国語の切り替えとオフライン利用に対応しています。
 
