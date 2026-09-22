@@ -2,7 +2,7 @@
 const D=window.SKILL_DATA,E=window.SkillEngine;
 const CLASSES={hunter:['猎人','Hu','ハンター'],fighter:['斗士','Fi','ファイター'],ranger:['游侠','Ra','レンジャー'],gunner:['鹰眼','Gu','ガンナー'],force:['法师','Fo','フォース'],techter:['术士','Te','テクター'],braver:['勇者','Br','ブレイバー'],bouncer:['跃动者','Bo','バウンサー'],summoner:['召唤师','Su','サモナー'],hero:['英雄','Hr','ヒーロー'],phantom:['幻影','Ph','ファントム'],etoile:['闪星','Et','エトワール'],luster:['辉刃','Lu','ラスター']};
 const SUCCESSORS=['hero','phantom','etoile','luster'];const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),plain=s=>s.replace(/<br\s*\/?\s*>/gi,'').trim();
-let state={v:2,main:'hunter',sub:'none',active:'main',subs:{},builds:{}},selected=0,scale=0.85,timer,lang=(()=>{try{return localStorage.getItem('pso2-lang')==='ja'?'ja':'zh'}catch{return 'zh'}})();
+let state=JSON.parse(JSON.stringify(window.DEFAULT_STATE)),selected=0,scale=0.85,timer,lang=(()=>{try{return localStorage.getItem('pso2-lang')==='ja'?'ja':'zh'}catch{return 'zh'}})();
 const sn=s=>lang==='ja'?(s.nameJa||s.name):(s.nameZh||s.name),sd=s=>lang==='ja'?(s.desc.textJa||s.desc.text):(s.desc.textZh||s.desc.text),pa=p=>lang==='ja'?(p.paramAttrJa||p.paramAttr):(p.paramAttrZh||p.paramAttr);
 const ui=(zh,ja)=>lang==='ja'?ja:zh,cn=k=>lang==='ja'?CLASSES[k][2]:CLASSES[k][0];
 function buildKey(role=state.active,key=state[role]){return role==='main'?'main:'+key:'sub:'+state.main+':'+key}
@@ -25,7 +25,8 @@ function validate(x){
 }
 
 try{if(location.hash.startsWith('#build=')){state=validate(JSON.parse(atob(location.hash.slice(7))));history.replaceState(null,'',location.pathname+location.search)}else {const raw=localStorage.getItem('pso2-classic-v2')||localStorage.getItem('pso2-classic-v1');if(raw)state=validate(JSON.parse(raw))}}catch{setTimeout(()=>notify('保存数据或配点链接无效，已载入默认技能树。'),100)}
-function get(role=state.active){const key=state[role];if(key==='none')return null;return state.builds[buildKey(role,key)]??=(role==='main'?E.preset(key):E.blank(key))}
+function defaultBuild(role=state.active,key=state[role]){const b=window.DEFAULT_STATE.builds[buildKey(role,key)];return b?JSON.parse(JSON.stringify(b)):E.blank(key)}
+function get(role=state.active){const key=state[role];if(key==='none')return null;return state.builds[buildKey(role,key)]??=defaultBuild(role,key)}
 function save(){try{localStorage.setItem('pso2-classic-v2',JSON.stringify(state));$('#save-status').textContent='配点已自动保存'}catch{$('#save-status').textContent='浏览器未允许本地保存'}}
 function notify(s){$('#toast').textContent=window.translateUI(s);$('#toast').classList.add('show');clearTimeout(timer);timer=setTimeout(()=>$('#toast').classList.remove('show'),3400)}
 function opts(vals,current){return vals.map(([v,t])=>`<option value="${v}" ${String(current)===String(v)?'selected':''}>${t}</option>`).join('')}
@@ -42,7 +43,7 @@ function drawDetail(){const b=get(),t=D[b.key];if(!t[selected]?.maxValue)selecte
 function change(i,v){selected=i;const result=E.set(get(),i,v);if(result.error){notify(result.error);drawTree();drawDetail();return}state.builds[buildKey()]=result.build;render()}
 function choose(role,key){
  if(role==='sub'&&(SUCCESSORS.includes(state.main)||key==='hero'||key===state.main))return;
- if(role==='main'){state.subs[state.main]=state.sub;state.main=key;state.sub=SUCCESSORS.includes(key)?'none':state.subs[key]||'none'}
+ if(role==='main'){state.subs[state.main]=state.sub;state.main=key;state.sub=SUCCESSORS.includes(key)?'none':state.subs[key]??window.DEFAULT_STATE.subs[key]??'none'}
  else {state.sub=key;state.subs[state.main]=key}
  state.active=key==='none'?'main':role;selected=0;render();$('#tree-scroll').scrollTo(0,0)
 }
@@ -54,9 +55,9 @@ document.addEventListener('change',e=>{if(e.target.dataset.class){choose(e.targe
 $('#lang-toggle').onclick=()=>{lang=lang==='zh'?'ja':'zh';try{localStorage.setItem('pso2-lang',lang)}catch{}render()};$('#zoom').addEventListener('change',e=>{scale=+e.target.value;drawTree()});$('#reset').onclick=()=>{const b=get();if(E.spent(b)&&!confirm(window.translateUI('重置当前职业的全部配点？')))return;state.builds[buildKey()]=E.blank(b.key,b.level,b.extra);render();notify('当前技能树已重置。')};
 $('#share').onclick=async()=>{const url=location.href.split('#')[0]+'#build='+btoa(JSON.stringify(state));try{await navigator.clipboard.writeText(url);notify('配点链接已复制。')}catch{$('#share-url').value=url;$('#share-dialog').showModal();$('#share-url').select()}};$('#close-share').onclick=()=>$('#share-dialog').close();render();
 
-$('#restore-default').onclick=()=>{const b=get(),isSub=state.active==='sub';const message=isSub?ui('副职业默认不加点。清空当前副职业的手动配点，并将等级设为100、追加SP设为14？','サブクラスの初期配分は未振りです。現在のサブクラスの配分を消去し、レベル100・追加SP14に設定しますか？'):ui('将当前职业恢复为默认配点，并将等级设为100、追加SP设为14？当前配点将被替换。','現在のクラスを初期配分に戻し、レベル100・追加SP14に設定しますか？現在の配分は上書きされます。');if(!confirm(message))return;state.builds[buildKey()]=isSub?E.blank(b.key):E.preset(b.key);render();notify(ui('已恢复默认配点。','初期配分に戻しました。'))};
+$('#restore-default').onclick=()=>{if(!confirm(ui('将当前技能树恢复为默认方案（含等级与追加SP）？当前配点将被替换。','現在のツリーを初期配分（レベル・追加SPを含む）に戻しますか？現在の配分は上書きされます。')))return;state.builds[buildKey()]=defaultBuild();render();notify(ui('已恢复默认配点。','初期配分に戻しました。'))};
 
-function exportData(){const copy=JSON.parse(JSON.stringify(state));for(const key of Object.keys(CLASSES)){copy.builds['main:'+key]??=E.preset(key);copy.subs[key]??='none'}return {format:'pso2-skill-simulator',version:1,language:lang,state:copy}}
+function exportData(){const copy=JSON.parse(JSON.stringify(state));for(const key of Object.keys(CLASSES)){copy.builds['main:'+key]??=defaultBuild('main',key);copy.subs[key]??=window.DEFAULT_STATE.subs[key]||'none'}return {format:'pso2-skill-simulator',version:1,language:lang,state:copy}}
 function parseImport(text){const data=JSON.parse(text.replace(/^\uFEFF/,''));if(data.format!==undefined&&(data.format!=='pso2-skill-simulator'||data.version!==1))throw Error('format');return {state:validate(data.state||data),language:data.language}}
 $('#export-builds').onclick=()=>{const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='PSO2-Skill-Builds.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('#import-builds').onclick=()=>$('#import-file').click();
