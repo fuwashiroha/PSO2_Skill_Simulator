@@ -2,7 +2,7 @@
 const D=window.SKILL_DATA,E=window.SkillEngine;
 const CLASSES={hunter:['猎人','Hu','ハンター'],fighter:['斗士','Fi','ファイター'],ranger:['游侠','Ra','レンジャー'],gunner:['鹰眼','Gu','ガンナー'],force:['法师','Fo','フォース'],techter:['术士','Te','テクター'],braver:['勇者','Br','ブレイバー'],bouncer:['跃动者','Bo','バウンサー'],summoner:['召唤师','Su','サモナー'],hero:['英雄','Hr','ヒーロー'],phantom:['幻影','Ph','ファントム'],etoile:['闪星','Et','エトワール'],luster:['辉刃','Lu','ラスター']};
 const SUCCESSORS=['hero','phantom','etoile','luster'];const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),plain=s=>s.replace(/<br\s*\/?\s*>/gi,'').trim();
-let state=JSON.parse(JSON.stringify(window.DEFAULT_STATE)),selected=0,scale=0.85,timer,lang=(()=>{try{return localStorage.getItem('pso2-lang')==='ja'?'ja':'zh'}catch{return 'zh'}})();
+let state=JSON.parse(JSON.stringify(window.DEFAULT_STATE)),selected=0,scale=0.85,timer,lang=(()=>{try{return localStorage.getItem('pso2-lang')==='zh'?'zh':'ja'}catch{return 'ja'}})();
 const sn=s=>lang==='ja'?(s.nameJa||s.name):(s.nameZh||s.name),sd=s=>lang==='ja'?(s.desc.textJa||s.desc.text):(s.desc.textZh||s.desc.text),pa=p=>lang==='ja'?(p.paramAttrJa||p.paramAttr):(p.paramAttrZh||p.paramAttr);
 const ui=(zh,ja)=>lang==='ja'?ja:zh,cn=k=>lang==='ja'?CLASSES[k][2]:CLASSES[k][0];
 function buildKey(role=state.active,key=state[role]){return role==='main'?'main:'+key:'sub:'+state.main+':'+key}
