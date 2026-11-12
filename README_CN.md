@@ -1,7 +1,6 @@
 [日本語](README.md) | [中文](README_CN.md)
 
 # PSO2 Skill Simulator
-<img width="2352" height="1812" alt="image" src="https://github.com/user-attachments/assets/26dc6862-4f57-4f77-b9e7-2c646b2c10c6" />
 
 支持旧《PSO2》全部13个职业的技能加点模拟器，包含技能图标，支持中日切换和离线使用。
 
