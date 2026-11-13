@@ -3,7 +3,7 @@
 const font='"Microsoft YaHei", "Yu Gothic", "Noto Sans CJK SC", sans-serif';
 const clean=s=>{const el=document.createElement('div');el.innerHTML=String(s||'').replace(/<br\s*\/?\s*>/gi,' ');return el.textContent.trim()};
 window.saveSkillScreenshot=async function(snap){
- const {build:b,skills:t,language,role}=snap,ja=language==='ja',tr=(zh,jp)=>ja?jp:zh;
+ const {build:b,skills:t,language,role}=snap,ja=language==='ja',tr=(zh,jp)=>language==='en'?window.SKILL_EN.translate(zh):ja?jp:zh;
  const visible=t.map((s,i)=>({s,i})).filter(({s})=>s.maxValue);
  const header=142,width=1228,height=header+24+Math.floor(visible.at(-1).i/6)*148+109+58;
  const canvas=document.createElement('canvas');canvas.width=width*2;canvas.height=height*2;
@@ -30,7 +30,7 @@ window.saveSkillScreenshot=async function(snap){
  for(const {s,i} of visible){const p=pos(i),lv=b.points[i],ready=b.level>=s.rqLv&&(s.preSkill<0||b.points[s.preSkill]>=s.preValue);
   rect(p.x,p.y,184,109,lv?'#193d40':'#1b2b3a',lv?'#498f88':'#3b5065');
   ctx.drawImage(images.get('skill_icon_'+s.img),p.x+9,p.y+10,34,34);
-  const name=clean(ja?(s.nameJa||s.name):(s.nameZh||s.name));
+  const name=clean(language==='en'?window.SKILL_EN.translate(s.nameJa||s.name):ja?(s.nameJa||s.name):(s.nameZh||s.name));
   let size=13,lines=[];
   do{ctx.font='bold '+size+'px '+font;lines=[''];for(const ch of name){let last=lines.length-1;if(ctx.measureText(lines[last]+ch).width>124&&lines[last])lines.push(ch);else lines[last]+=ch}if(lines.length<=3)break;size--}while(size>=8);
   lines.forEach((line,k)=>text(line,p.x+49,p.y+17+k*(size+2),size,s.mainOnly?'#ffaaaa':ready||lv?'#dce8f2':'#96a6b7','bold'));
